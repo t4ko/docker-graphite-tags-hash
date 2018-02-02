@@ -77,7 +77,8 @@ ADD conf/etc/nginx/sites-enabled/graphite-tags-hash.conf /etc/nginx/sites-enable
 # init django admin
 ADD conf/usr/local/bin/django_admin_init.exp /usr/local/bin/django_admin_init.exp
 ADD conf/usr/local/bin/manage.sh /usr/local/bin/manage.sh
-RUN chmod +x /usr/local/bin/manage.sh && /usr/local/bin/django_admin_init.exp
+RUN chmod +x /usr/local/bin/manage.sh && chmod +x /usr/local/bin/django_admin_init.exp \
+  && ls -l /usr/local/bin/ && /usr/local/bin/django_admin_init.exp
 
 # logging support
 RUN mkdir -p /var/log/carbon /var/log/graphite /var/log/nginx
@@ -88,6 +89,7 @@ ADD conf/etc/service/carbon/run /etc/service/carbon/run
 ADD conf/etc/service/carbon-aggregator/run /etc/service/carbon-aggregator/run
 ADD conf/etc/service/graphite/run /etc/service/graphite/run
 ADD conf/etc/service/nginx/run /etc/service/nginx/run
+RUN chmod -R +x /etc/service/
 
 # default conf setup
 ADD conf /etc/graphite-tags-hash/conf
