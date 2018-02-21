@@ -1,4 +1,4 @@
-FROM phusion/baseimage:0.9.22
+FROM phusion/baseimage:0.10.0
 
 RUN apt-get -y update \
   && apt-get -y upgrade \
@@ -33,16 +33,16 @@ RUN if [ ! -z "${CONTAINER_TIMEZONE}" ]; \
 
 # fix python dependencies (LTS Django)
 RUN pip install --upgrade pip && \
-  pip install django==1.8.18
+  pip install django==1.11.10
 
-ARG version=1.1.1
+ARG version=master
 ARG whisper_version=${version}
-ARG carbon_version=tag-hash-files
-ARG graphite_version=tag-hash-files
+ARG carbon_version=${version}
+ARG graphite_version=${version}
 
 ARG whisper_repo=https://github.com/graphite-project/whisper.git
-ARG carbon_repo=https://github.com/DanCech/carbon.git
-ARG graphite_repo=https://github.com/DanCech/graphite-web.git
+ARG carbon_repo=https://github.com/graphite-project/carbon.git
+ARG graphite_repo=https://github.com/graphite-project/graphite-web.git
 
 # install whisper
 RUN git clone -b ${whisper_version} --depth 1 ${whisper_repo} /usr/local/src/whisper
@@ -77,12 +77,13 @@ ADD conf/etc/nginx/sites-enabled/graphite-tags-hash.conf /etc/nginx/sites-enable
 # init django admin
 ADD conf/usr/local/bin/django_admin_init.exp /usr/local/bin/django_admin_init.exp
 ADD conf/usr/local/bin/manage.sh /usr/local/bin/manage.sh
-RUN chmod +x /usr/local/bin/manage.sh && chmod +x /usr/local/bin/django_admin_init.exp \
-  && ls -l /usr/local/bin/ && /usr/local/bin/django_admin_init.exp
+RUN chmod +x /usr/local/bin/manage.sh && chmod +x /usr/local/bin/django_admin_init.exp
 
 # logging support
 RUN mkdir -p /var/log/carbon /var/log/graphite /var/log/nginx
 ADD conf/etc/logrotate.d/graphite-tags-hash /etc/logrotate.d/graphite-tags-hash
+ADD conf/etc/logrotate.d/graphite-carbon /etc/logrotate.d/graphite-carbon
+ADD conf/etc/logrotate.d/graphite-web /etc/logrotate.d/graphite-web
 
 # daemons
 ADD conf/etc/service/carbon/run /etc/service/carbon/run
